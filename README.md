@@ -11,7 +11,7 @@ In your Gemfile:
 Do a bundle install, then for each model add the has_safe_dates class method to your model:
 
     class Post < ActiveRecord::Base
-      has_custom_fields :published_date
+      has_safe_dates :published_date
     end
 
 You can now do things like this:
