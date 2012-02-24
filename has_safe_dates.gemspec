@@ -18,9 +18,12 @@ Gem::Specification.new do |s|
   ]
   s.files = [
     "Gemfile",
+    "LICENSE.txt",
+    "README.rdoc",
     "Rakefile",
     "VERSION",
     "has_safe_dates.gemspec",
+    "has_safe_dates.gemspec.txt",
     "lib/has_safe_dates.rb",
     "lib/has_safe_dates/core_ext.rb",
     "spec/db/database.yml",
