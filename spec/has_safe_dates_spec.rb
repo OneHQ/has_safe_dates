@@ -72,9 +72,11 @@ describe "HasSafeDates" do
 
   describe "multiparameter parsing" do
     it "doesn't blow up when given an incorrect values" do
-      invalid_attributes = {'published_date(1)' => "abc", 'published_date(2)' => "12", 'published_date(3)' => "1"}      
+      invalid_post_attributes = {'published_date(1)' => "abc", 'published_date(2)' => "12", 'published_date(3)' => "1"}      
+      invalid_comment_attributes = {'approved_at(1)' => "abc", 'approved_at(2)' => "12", 'approved_at(3)' => "1"}      
       expect {
-        @post.update_attributes(invalid_attributes)
+        @post.update_attributes(invalid_post_attributes)
+        @comment.update_attributes(invalid_comment_attributes)
       }.to_not raise_error
     end
 

@@ -8,7 +8,7 @@ module HasSafeDates
     module ClassMethods
 
       def has_safe_fields_config
-        @@has_safe_fields_config ||= {}
+        @has_safe_fields_config ||= {}
       end
 
       def has_safe_dates(*args)
