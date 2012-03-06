@@ -6,10 +6,15 @@ class Post < ActiveRecord::Base
   has_safe_dates :published_date, :safe_date, :error_message => 'is not a real date'
 end
 
+class Comment < ActiveRecord::Base
+  has_safe_dates :approved_at, :error_message => 'is not a real date'
+end
+
 describe "HasSafeDates" do
 
   before(:each) do 
     @post = Post.new
+    @comment = Comment.new
   end
 
   describe "class method" do
@@ -38,8 +43,11 @@ describe "HasSafeDates" do
     ['2012-12-1', '1st of December 2012', 'first of dec 2012', '1 Dec 2012'].each do |date|
       it "allows you to set the date as '#{date}'" do
         @post.update_attribute(:safe_date, date)
+        @comment.update_attribute(:approved_at, date)
         @post.reload
+        @comment.reload
         @post.safe_date.should == Date.new(2012, 12, 1)
+        @comment.approved_at.should == Date.new(2012, 12, 1)
       end
     end
 
@@ -64,9 +72,11 @@ describe "HasSafeDates" do
 
   describe "multiparameter parsing" do
     it "doesn't blow up when given an incorrect values" do
-      invalid_attributes = {'published_date(1)' => "abc", 'published_date(2)' => "12", 'published_date(3)' => "1"}      
+      invalid_post_attributes = {'published_date(1)' => "abc", 'published_date(2)' => "12", 'published_date(3)' => "1"}      
+      invalid_comment_attributes = {'approved_at(1)' => "abc", 'approved_at(2)' => "12", 'approved_at(3)' => "1"}      
       expect {
-        @post.update_attributes(invalid_attributes)
+        @post.update_attributes(invalid_post_attributes)
+        @comment.update_attributes(invalid_comment_attributes)
       }.to_not raise_error
     end
 

@@ -8,7 +8,7 @@ module HasSafeDates
     module ClassMethods
 
       def has_safe_fields_config
-        @@has_safe_fields_config ||= {}
+        @has_safe_fields_config ||= {}
       end
 
       def has_safe_dates(*args)
@@ -27,7 +27,7 @@ module HasSafeDates
         has_safe_fields_config[:fields].each do |field|
           define_method "#{field.to_s}=" do |value|
             if value.present?
-              value = Chronic.parse(value)
+              value = Chronic.parse(value.to_s)
               self.errors.add(field, self.class.has_safe_fields_config[:error_message]) unless value.present?
             end
             super value
