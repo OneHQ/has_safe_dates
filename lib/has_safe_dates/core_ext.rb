@@ -8,27 +8,30 @@ module HasSafeDates
     module ClassMethods
 
       def has_safe_fields_config
-        @has_safe_fields_config ||= {}
+        @@has_safe_fields_config ||= {}
       end
 
       def has_safe_dates(*args)
         options = args.extract_options!
+        has_safe_fields_config[self] = options
 
         if options[:error_message].present?
-          has_safe_fields_config[:error_message] = options[:error_message]
+          has_safe_fields_config[self][:error_message] = options[:error_message]
         else
-          has_safe_fields_config[:error_message] = I18n.translate('activerecord.errors.messages')[:invalid] || 'is invalid'
+          has_safe_fields_config[self][:error_message] = I18n.translate('activerecord.errors.messages')[:invalid] || 'is invalid'
         end
 
         if args.blank?
           raise ArgumentError, 'Must define the fields you want to be converted to safe dates with "has_safe_dates :my_field_name_date, :my_other_field_name_date"'
         end
-        has_safe_fields_config[:fields] = args.map(&:to_s)
-        has_safe_fields_config[:fields].each do |field|
+        has_safe_fields_config[self][:fields] = args.map(&:to_s)
+        has_safe_fields_config[self][:fields].each do |field|
           define_method "#{field.to_s}=" do |value|
             if value.present?
               value = Chronic.parse(value.to_s)
-              self.errors.add(field, self.class.has_safe_fields_config[:error_message]) unless value.present?
+              unless value.present?
+                self.errors.add(field, self.class.has_safe_fields_config[self.class][:error_message])
+              end
             end
             super value
           end
@@ -37,7 +40,11 @@ module HasSafeDates
     end
 
     def read_value_from_parameter(name, values_hash_from_param)
-      if self.class.has_safe_fields_config[:fields].include?(name.to_s)
+      if self.class.has_safe_fields_config[self.class]
+        fields = self.class.has_safe_fields_config[self.class][:fields]
+      end
+
+      if fields.present? && fields.include?(name.to_s)
 
         max_position = extract_max_param_for_multiparameter_attributes(values_hash_from_param, 6)
         return nil if (1..3).any? {|position| values_hash_from_param[position].blank?}
