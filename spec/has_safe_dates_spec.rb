@@ -53,8 +53,8 @@ describe "HasSafeDates" do
 
     ['     ', '', nil].each do |date|
       it "sets the field to nil if given the blank value #{date.inspect}" do
-        @post.update_attribute(:safe_date, date)
-        @post.reload
+        @post.safe_date = date
+        @post.valid?
         @post.safe_date.should == nil
         @post.errors.should be_blank
       end
@@ -62,15 +62,18 @@ describe "HasSafeDates" do
 
     ['random', 'does not compute'].each do |date|
       it "sets the field to nil and sets a validation error if given the value #{date.inspect}" do
-        @post.update_attribute(:safe_date, date)
-        @post.reload
+        @post.safe_date = date
+        @post.valid?
         @post.safe_date.should == nil
         @post.errors.should_not be_blank
+        @post.errors[:safe_date].should == ['is not a real date']
       end
     end
+
   end
 
   describe "multiparameter parsing" do
+
     it "doesn't blow up when given an incorrect values" do
       invalid_post_attributes = {'published_date(1)' => "abc", 'published_date(2)' => "12", 'published_date(3)' => "1"}      
       invalid_comment_attributes = {'approved_at(1)' => "abc", 'approved_at(2)' => "12", 'approved_at(3)' => "1"}      
@@ -87,8 +90,12 @@ describe "HasSafeDates" do
       }.to raise_error(ActiveRecord::MultiparameterAssignmentErrors, '1 error(s) on assignment of multiparameter attributes')
     end
 
+    it "adds an error when Chronic returns nil" do
+      invalid_post_attributes = {'published_date(1)' => "abc", 'published_date(2)' => "12", 'published_date(3)' => "1"}      
+      @post.update_attributes(invalid_post_attributes)
+      @post.errors[:published_date].should == ['is not a real date']
+    end
+
   end
-
-
 
 end

@@ -25,18 +25,35 @@ module HasSafeDates
           raise ArgumentError, 'Must define the fields you want to be converted to safe dates with "has_safe_dates :my_field_name_date, :my_other_field_name_date"'
         end
         has_safe_fields_config[self][:fields] = args.map(&:to_s)
+
         has_safe_fields_config[self][:fields].each do |field|
           define_method "#{field.to_s}=" do |value|
             if value.present?
               value = Chronic.parse(value.to_s)
-              unless value.present?
-                self.errors.add(field, self.class.has_safe_fields_config[self.class][:error_message])
+              if value.blank? && self.class.has_safe_fields_config[self.class][:error_message].present?
+                @safe_date_validation_errors ||= {}
+                @safe_date_validation_errors[field] = self.class.has_safe_fields_config[self.class][:error_message]
               end
             end
             super value
           end
         end
+
+        define_method "_set_safe_date_validation_errors" do
+          if @safe_date_validation_errors.present?
+            @safe_date_validation_errors.each_pair do |field, error|
+              errors.add(field, error)
+            end
+          end
+          @safe_date_validation_errors = nil
+        end
+
+        class_eval do
+          validate :_set_safe_date_validation_errors
+        end
+
       end
+
     end
 
     def read_value_from_parameter(name, values_hash_from_param)
@@ -52,9 +69,7 @@ module HasSafeDates
 
         date = set_values[0..2].join('-')
         time = set_values[3..5].join(':')
-        value = Chronic.parse("#{date} #{time}")
-
-        return value
+        "#{date} #{time}"
       else
         super name, values_hash_from_param
       end
