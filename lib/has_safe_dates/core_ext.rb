@@ -52,24 +52,6 @@ module HasSafeDates
         end
       end
     end
-
-    def read_value_from_parameter(name, values_hash_from_param)
-      if self.class.has_safe_fields_config[self.class]
-        fields = self.class.has_safe_fields_config[self.class][:fields]
-      end
-
-      if fields.present? && fields.include?(name.to_s)
-        max_position = extract_max_param_for_multiparameter_attributes(values_hash_from_param, 6)
-        return nil if (1..3).any? {|position| values_hash_from_param[position].blank?}
-        set_values = (1..max_position).collect{|position| values_hash_from_param[position] }
-
-        date = set_values[0..2].join('-')
-        time = set_values[3..5].join(':')
-        "#{date} #{time}"
-      else
-        super name, values_hash_from_param
-      end
-    end
   end
 
   module MultiparameterAttributeExt
