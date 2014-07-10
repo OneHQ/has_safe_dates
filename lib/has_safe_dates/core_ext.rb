@@ -77,5 +77,5 @@ module HasSafeDates
 
   end
 end
- 
+
 ActiveRecord::Base.send :include, HasSafeDates::CoreExt
