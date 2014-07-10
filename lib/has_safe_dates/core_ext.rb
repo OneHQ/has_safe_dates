@@ -6,7 +6,6 @@ module HasSafeDates
     extend ActiveSupport::Concern
 
     module ClassMethods
-
       def has_safe_fields_config
         @@has_safe_fields_config ||= {}
       end
@@ -51,31 +50,22 @@ module HasSafeDates
         class_eval do
           validate :_set_safe_date_validation_errors
         end
-
       end
-
     end
+  end
 
-    def read_value_from_parameter(name, values_hash_from_param)
-      if self.class.has_safe_fields_config[self.class]
-        fields = self.class.has_safe_fields_config[self.class][:fields]
-      end
-
-      if fields.present? && fields.include?(name.to_s)
-
-        max_position = extract_max_param_for_multiparameter_attributes(values_hash_from_param, 6)
-        return nil if (1..3).any? {|position| values_hash_from_param[position].blank?}
-        set_values = (1..max_position).collect{|position| values_hash_from_param[position] }
-
-        date = set_values[0..2].join('-')
-        time = set_values[3..5].join(':')
-        "#{date} #{time}"
+  module MultiparameterAttributeExt
+    # Overrides #read_date when has_safe_dates is enabled for the current field the multiparameter.
+    # Otherwise the original #read_date method is invoked.
+    def read_date
+      if ActiveRecord::Base.has_safe_fields_config[object.class] && ActiveRecord::Base.has_safe_fields_config[object.class][:fields].include?(name)
+        values.values_at(1,2,3).join("-")  # Convert multiparameter parts into a Date string, e.g. "2011-4-23", return it, and allow CoreExt methods handle the result.
       else
-        super name, values_hash_from_param
+        super  # has_safe_dates is not enabled for the current field, so invoke the super method (original #read_date method).
       end
     end
-
   end
 end
- 
+
 ActiveRecord::Base.send :include, HasSafeDates::CoreExt
+ActiveRecord::AttributeAssignment::MultiparameterAttribute.send :prepend, HasSafeDates::MultiparameterAttributeExt

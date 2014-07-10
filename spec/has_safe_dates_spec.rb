@@ -12,7 +12,7 @@ end
 
 describe "HasSafeDates" do
 
-  before(:each) do 
+  before(:each) do
     @post = Post.new
     @comment = Comment.new
   end
@@ -75,8 +75,8 @@ describe "HasSafeDates" do
   describe "multiparameter parsing" do
 
     it "doesn't blow up when given an incorrect values" do
-      invalid_post_attributes = {'published_date(1)' => "abc", 'published_date(2)' => "12", 'published_date(3)' => "1"}      
-      invalid_comment_attributes = {'approved_at(1)' => "abc", 'approved_at(2)' => "12", 'approved_at(3)' => "1"}      
+      invalid_post_attributes = {'published_date(1i)' => "2001", 'published_date(2i)' => "12", 'published_date(3i)' => "abc"}
+      invalid_comment_attributes = {'approved_at(1i)' => "2001", 'approved_at(2i)' => "12", 'approved_at(3i)' => "abc"}
       expect {
         @post.update_attributes(invalid_post_attributes)
         @comment.update_attributes(invalid_comment_attributes)
@@ -84,14 +84,14 @@ describe "HasSafeDates" do
     end
 
     it "does not interfere with a date column that it has not been told to make safe" do
-      invalid_attributes = {'unsafe_date(1)' => "abc", 'unsafe_date(2)' => "12", 'unsafe_date(3)' => "1"}      
+      invalid_attributes = {'unsafe_date(1i)' => "2001", 'unsafe_date(2i)' => "12", 'unsafe_date(3i)' => "abc"}
       expect {
         @post.update_attributes(invalid_attributes)
-      }.to raise_error(ActiveRecord::MultiparameterAssignmentErrors, '1 error(s) on assignment of multiparameter attributes')
+      }.to raise_error(ActiveRecord::MultiparameterAssignmentErrors)
     end
 
     it "adds an error when Chronic returns nil" do
-      invalid_post_attributes = {'published_date(1)' => "abc", 'published_date(2)' => "12", 'published_date(3)' => "1"}      
+      invalid_post_attributes = {'published_date(1i)' => "2001", 'published_date(2i)' => "12", 'published_date(3i)' => "abc"}
       @post.update_attributes(invalid_post_attributes)
       @post.errors[:published_date].should == ['is not a real date']
     end
