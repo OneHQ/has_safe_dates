@@ -29,9 +29,9 @@ module HasSafeDates
           define_method "#{field.to_s}=" do |value|
             if value.present?
               value = Chronic.parse(value.to_s)
-              if value.blank? && self.class.has_safe_fields_config[self.class][:error_message].present?
+              if value.blank? && self.class.has_safe_fields_config[self.class.base_class][:error_message].present?
                 @safe_date_validation_errors ||= {}
-                @safe_date_validation_errors[field] = self.class.has_safe_fields_config[self.class][:error_message]
+                @safe_date_validation_errors[field] = self.class.has_safe_fields_config[self.class.base_class][:error_message]
               end
             end
             super value
@@ -58,7 +58,7 @@ module HasSafeDates
     # Overrides #read_date when has_safe_dates is enabled for the current field the multiparameter.
     # Otherwise the original #read_date method is invoked.
     def read_date
-      if ActiveRecord::Base.has_safe_fields_config[object.class] && ActiveRecord::Base.has_safe_fields_config[object.class][:fields].include?(name)
+      if ActiveRecord::Base.has_safe_fields_config[object.class.base_class] && ActiveRecord::Base.has_safe_fields_config[object.class.base_class][:fields].include?(name)
         values.values_at(1,2,3).join("-")  # Convert multiparameter parts into a Date string, e.g. "2011-4-23", return it, and allow CoreExt methods handle the result.
       else
         super  # has_safe_dates is not enabled for the current field, so invoke the super method (original #read_date method).
