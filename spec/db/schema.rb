@@ -7,6 +7,7 @@ ActiveRecord::Schema.define(:version => 0) do
     t.date     "approved_at"
     t.date     "created_at"
     t.date     "updated_at"
+    t.datetime "published_at"
   end
 
   create_table "posts", :force => true do |t|
