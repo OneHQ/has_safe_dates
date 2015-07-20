@@ -64,6 +64,16 @@ module HasSafeDates
         super  # has_safe_dates is not enabled for the current field, so invoke the super method (original #read_date method).
       end
     end
+
+    # Overrides #read_time when has_safe_dates is enabled for the current field the multiparameter.
+    # Otherwise the original #read_date method is invoked.
+    def read_time
+      if ActiveRecord::Base.has_safe_fields_config[object.class.base_class] && ActiveRecord::Base.has_safe_fields_config[object.class.base_class][:fields].include?(name)
+        "#{ values.values_at(1,2,3).join("-")} #{ values.values_at(4,5).join(":") }"  # Convert multiparameter parts into a Time string, e.g. "2011-4-23 12:34", return it, and allow CoreExt methods handle the result.
+      else
+        super  # has_safe_dates is not enabled for the current field, so invoke the super method (original #read_time method).
+      end
+    end
   end
 end
 
