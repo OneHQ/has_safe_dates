@@ -1,0 +1,116 @@
+# Ruby CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-ruby/ for more details
+#
+defaults: &defaults
+  working_directory: ~/repo
+  docker:
+    - image: circleci/ruby:2.3.6-stretch-node
+      environment:
+        - RACK_ENV: test
+        - RAILS_ENV: test
+
+version: 2
+jobs:
+  run_specs:
+    <<: *defaults
+
+    steps:
+      - run:
+          name: Set up environment
+          command: |
+            sudo apt-get update && sudo apt-get install -y apt-transport-https apt-utils
+
+      - checkout
+
+      - restore_cache:
+          keys:
+          - has_safe_dates-dependencies-v1-{{ checksum "has_safe_dates.gemspec" }}
+          - has_safe_dates-dependencies-v1-
+
+      - run:
+          name: Install dependencies
+          command: |
+            bundle check --path=./vendor/bundle || bundle install --path=./vendor/bundle --jobs=4 --retry=3
+
+      - save_cache:
+          key: has_safe_dates-dependencies-v1-{{ checksum "has_safe_dates.gemspec" }}
+          paths:
+            - ./vendor/bundle
+
+      - run:
+          name: Run tests
+          command: |
+            mkdir /tmp/test-results
+            TEST_FILES="$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)"
+            bundle exec rspec --format progress --format RspecJunitFormatter --out /tmp/test-results/rspec.xml $TEST_FILES
+
+      - store_test_results:
+          path: /tmp/test-results
+
+      - store_artifacts:
+          path: /tmp/test-results
+          destination: test-results
+
+  build_gem:
+    <<: *defaults
+
+    steps:
+      - run:
+          name: Set up environment
+          command: |
+            sudo apt-get update && sudo apt-get install -y apt-transport-https apt-utils
+
+      - checkout
+
+      - restore_cache:
+          keys:
+          - has_safe_dates-dependencies-v1-{{ checksum "has_safe_dates.gemspec" }}
+          - has_safe_dates-dependencies-v1-
+
+      - run:
+          name: Install dependencies
+          command: |
+            gem install gemfury
+            bundle check --path=./vendor/bundle || bundle install --path=./vendor/bundle --jobs=4 --retry=3
+
+      - save_cache:
+          key: has_safe_dates-dependencies-v1-{{ checksum "has_safe_dates.gemspec" }}
+          paths:
+            - ./vendor/bundle
+
+      - run:
+          name: Build gem
+          command: |
+            gem build has_safe_dates.gemspec
+
+      - run:
+          name: Push gem
+          command: |
+            if [[ "${CIRCLE_PROJECT_USERNAME}" == "OneHQ" && "${CIRCLE_BRANCH}" == "master" && -n "${GEMFURY_USERNAME}" && -n "${GEMFURY_PASSWORD}" ]]; then
+              echo -e "machine api.fury.io\n  login ${GEMFURY_USERNAME}\n  password ${GEMFURY_PASSWORD}" >> ~/.netrc
+              chmod 600 ~/.netrc
+              version=$(ruby -e 'load "lib/has_safe_dates/version.rb"; puts HasSafeDates::VERSION')
+              grep -q "${version}" <(fury versions has_safe_dates) || EXIT_CODE=$? && true
+              if [[ $EXIT_CODE == 1 ]]; then
+                fury push has_safe_dates-${version}.gem
+                git tag ${version}
+                git push --tags
+
+                [[ -n "$SLACK_TOKEN" ]] && curl -s -d "has_safe_dates ($version) released." "https://onehq.slack.com/services/hooks/slackbot?token=${SLACK_TOKEN}&channel=%23machines"
+              fi
+            fi
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - run_specs
+      - build_gem:
+          requires:
+            - run_specs
+          filters:
+            branches:
+              only:
+                - master
+                - staging

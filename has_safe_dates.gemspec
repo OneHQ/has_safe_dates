@@ -38,26 +38,27 @@ Gem::Specification.new do |s|
   if s.respond_to? :specification_version then
     s.specification_version = 3
 
-    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_development_dependency("activerecord", ['~> 4.0.0'])
+    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("1.2.0") then
       s.add_dependency("chronic")
-      s.add_development_dependency("rspec", [">= 0", "< 3"])
-      s.add_development_dependency("rdoc", ["~> 3.12"])
+      s.add_development_dependency("activerecord", ["~> 4.0.0"])
       s.add_development_dependency("bundler", ["~> 1.0"])
+      s.add_development_dependency("database_cleaner")
+      s.add_development_dependency("rdoc", ["~> 3.12"])
+      s.add_development_dependency("rspec_junit_formatter", ["~> 0.3", ">= 0.3.0"])
+      s.add_development_dependency("rspec", [">= 0", "< 3"])
       s.add_development_dependency("sqlite3")
-      s.add_development_dependency('database_cleaner')
     else
-      s.add_dependency("activerecord", ['>= 3.1.0'])
-      s.add_dependency("chronic")
-      s.add_dependency("rspec", [">= 0"])
-      s.add_dependency("rdoc", ["~> 3.12"])
+      s.add_dependency("activerecord", [">= 3.1.0"])
       s.add_dependency("bundler", ["~> 1.0.0"])
+      s.add_dependency("chronic")
+      s.add_dependency("rdoc", ["~> 3.12"])
+      s.add_dependency("rspec", [">= 0"])
     end
   else
-    s.add_dependency('activerecord', ['>= 3.1.0'])
-    s.add_dependency('chronic')
-    s.add_dependency("rspec", [">= 0"])
-    s.add_dependency("rdoc", ["~> 3.12"])
+    s.add_dependency("activerecord", [">= 3.1.0"])
     s.add_dependency("bundler", ["~> 1.0.0"])
+    s.add_dependency("chronic")
+    s.add_dependency("rdoc", ["~> 3.12"])
+    s.add_dependency("rspec", [">= 0"])
   end
 end
