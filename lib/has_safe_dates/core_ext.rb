@@ -69,7 +69,9 @@ module HasSafeDates
     # Otherwise the original #read_date method is invoked.
     def read_time
       if ActiveRecord::Base.has_safe_fields_config[object.class.base_class] && ActiveRecord::Base.has_safe_fields_config[object.class.base_class][:fields].include?(name)
-        "#{ values.values_at(1,2,3).join("-")} #{ values.values_at(4,5).join(":") }"  # Convert multiparameter parts into a Time string, e.g. "2011-4-23 12:34", return it, and allow CoreExt methods handle the result.
+        date = values.values_at(1,2,3).join("-")
+        time = values.values_at(4,5).map{ |digit| "%02i" % digit }.join(":")  # Zero-pad the hour and minute values to work around a Chronic bug, see https://github.com/mojombo/chronic/issues/314
+        "#{ date } #{ time }"  # Convert multiparameter parts into a Time string, e.g. "2011-4-23 12:34", return it, and allow CoreExt methods handle the result.
       else
         super  # has_safe_dates is not enabled for the current field, so invoke the super method (original #read_time method).
       end
