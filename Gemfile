@@ -1,7 +1,7 @@
+# frozen_string_literal: true
+
 source "http://rubygems.org"
 
 gemspec
-
-# gem 'ruby-debug19'
 
 gem "byebug"

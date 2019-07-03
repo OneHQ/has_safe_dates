@@ -1,8 +1,9 @@
 # encoding: utf-8
+# frozen_string_literal: true
 
-require 'rubygems'
-require 'rake'
-require 'bundler'
+require "rubygems"
+require "rake"
+require "bundler"
 
 begin
   Bundler.setup(:default, :development)
@@ -16,4 +17,4 @@ task :spec do
   sh("bundle exec rspec spec") { |ok, res| }
 end
 
-task :default => :spec
+task default: :spec

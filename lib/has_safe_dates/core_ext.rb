@@ -1,7 +1,8 @@
-require 'chronic'
+# frozen_string_literal: true
+
+require "chronic"
 
 module HasSafeDates
-
   module CoreExt
     extend ActiveSupport::Concern
 
@@ -17,7 +18,7 @@ module HasSafeDates
         if options[:error_message].present?
           has_safe_fields_config[self][:error_message] = options[:error_message]
         else
-          has_safe_fields_config[self][:error_message] = I18n.translate('activerecord.errors.messages')[:invalid] || 'is invalid'
+          has_safe_fields_config[self][:error_message] = I18n.translate("activerecord.errors.messages")[:invalid] || "is invalid"
         end
 
         if args.blank?
@@ -26,7 +27,7 @@ module HasSafeDates
         has_safe_fields_config[self][:fields] = args.map(&:to_s)
 
         has_safe_fields_config[self][:fields].each do |field|
-          define_method "#{field.to_s}=" do |value|
+          define_method "#{field}=" do |value|
             if value.present?
               value = Chronic.parse(value.to_s)
               if value.blank? && self.class.has_safe_fields_config[self.class.base_class][:error_message].present?
@@ -54,28 +55,28 @@ module HasSafeDates
     end
   end
 
-  module MultiparameterAttributeExt
-    # Overrides #read_date when has_safe_dates is enabled for the current field the multiparameter.
-    # Otherwise the original #read_date method is invoked.
-    def read_date
-      if ActiveRecord::Base.has_safe_fields_config[object.class.base_class] && ActiveRecord::Base.has_safe_fields_config[object.class.base_class][:fields].include?(name)
-        values.values_at(1,2,3).join("-")  # Convert multiparameter parts into a Date string, e.g. "2011-4-23", return it, and allow CoreExt methods handle the result.
-      else
-        super  # has_safe_dates is not enabled for the current field, so invoke the super method (original #read_date method).
-      end
-    end
+  module DateTimeExt
+    def execute_callstack_for_multiparameter_attributes(callstack)
+      if ::ActiveRecord::Base.has_safe_fields_config[self.class.base_class]
+        callstack.each do |name, values_with_empty_parameters|
+          if ActiveRecord::Base.has_safe_fields_config[self.class.base_class][:fields].include?(name)
+            date = values_with_empty_parameters.values_at(1, 2, 3).join("-")
+            time = values_with_empty_parameters.values_at(4, 5).join(":")
+            datetime_string = "#{date}#{time.blank? ? "" : " #{time}"}"
 
-    # Overrides #read_time when has_safe_dates is enabled for the current field the multiparameter.
-    # Otherwise the original #read_date method is invoked.
-    def read_time
-      if ActiveRecord::Base.has_safe_fields_config[object.class.base_class] && ActiveRecord::Base.has_safe_fields_config[object.class.base_class][:fields].include?(name)
-        "#{ values.values_at(1,2,3).join("-")} #{ values.values_at(4,5).join(":") }"  # Convert multiparameter parts into a Time string, e.g. "2011-4-23 12:34", return it, and allow CoreExt methods handle the result.
+            # Convert multiparameter parts into a Date string, e.g. "2011-4-23",
+            # and pass it through so that CoreExt methods handle the result.
+            send("#{name}=", datetime_string)
+          else
+            super({ name => values_with_empty_parameters })
+          end
+        end
       else
-        super  # has_safe_dates is not enabled for the current field, so invoke the super method (original #read_time method).
+        super(callstack)  # has_safe_dates is not enabled for the current field, so invoke the super method
       end
     end
   end
 end
 
-ActiveRecord::Base.send :include, HasSafeDates::CoreExt
-ActiveRecord::AttributeAssignment::MultiparameterAttribute.send :prepend, HasSafeDates::MultiparameterAttributeExt
+::ActiveRecord::Base.send :include, ::HasSafeDates::CoreExt
+::ActiveRecord::Base.send :prepend, ::HasSafeDates::DateTimeExt
