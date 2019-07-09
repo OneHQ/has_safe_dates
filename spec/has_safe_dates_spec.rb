@@ -78,21 +78,21 @@ describe "HasSafeDates" do
       invalid_post_attributes = {'published_date(1i)' => "2001", 'published_date(2i)' => "12", 'published_date(3i)' => "abc"}
       invalid_comment_attributes = {'approved_at(1i)' => "2001", 'approved_at(2i)' => "15", 'approved_at(3i)' => "17"}
       expect {
-        @post.update_attributes(invalid_post_attributes)
-        @comment.update_attributes(invalid_comment_attributes)
+        @post.update(invalid_post_attributes)
+        @comment.update(invalid_comment_attributes)
       }.to_not raise_error
     end
 
     it "does not interfere with a date column that it has not been told to make safe" do
       invalid_attributes = {'unsafe_date(1i)' => "2001", 'unsafe_date(2i)' => "12", 'unsafe_date(3i)' => "abc"}
       expect {
-        @post.update_attributes(invalid_attributes)
+        @post.update(invalid_attributes)
       }.to raise_error(ActiveRecord::MultiparameterAssignmentErrors)
     end
 
     it "adds an error when Chronic returns nil" do
       invalid_post_attributes = {'published_date(1i)' => "2014", 'published_date(2i)' => "12", 'published_date(3i)' => "abc"}
-      @post.update_attributes(invalid_post_attributes)
+      @post.update(invalid_post_attributes)
       @post.errors[:published_date].should == ['is not a real date']
     end
 
@@ -100,7 +100,7 @@ describe "HasSafeDates" do
       it "works" do
         invalid_comment_attributes = {'published_at(1i)' => "2014", 'published_at(2i)' => "12", 'published_at(3i)' => "22", 'published_at(4i)' => "12", 'published_at(5i)' => "34"}
         expect {
-          @comment.update_attributes(invalid_comment_attributes)
+          @comment.update(invalid_comment_attributes)
         }.to_not raise_error
         expect(@comment.published_at.utc.strftime("%FT%T%:z")).to eq(Time.new(2014, 12, 22, 12, 34).utc.strftime("%FT%T%:z"))
       end
@@ -109,21 +109,21 @@ describe "HasSafeDates" do
         invalid_post_attributes = {'published_date(1i)' => "2001", 'published_date(2i)' => "12", 'published_date(3i)' => "17", 'published_date(4i)' => "12", 'published_date(5i)' => "34"}
         invalid_comment_attributes = {'published_at(1i)' => "2001", 'published_at(2i)' => "15", 'published_at(3i)' => "17", 'published_at(4i)' => "12", 'published_at(5i)' => "34"}
         expect {
-          @post.update_attributes(invalid_post_attributes)
-          @comment.update_attributes(invalid_comment_attributes)
+          @post.update(invalid_post_attributes)
+          @comment.update(invalid_comment_attributes)
         }.to_not raise_error
       end
 
       it "does not interfere with a date column that it has not been told to make safe" do
         invalid_attributes = {'unsafe_date(1i)' => "2011", 'unsafe_date(2i)' => "9", 'unsafe_date(3i)' => "83", 'unsafe_date(4i)' => "12", 'unsafe_date(5i)' => "34"}
         expect {
-          @post.update_attributes(invalid_attributes)
+          @post.update(invalid_attributes)
         }.to raise_error(ActiveRecord::MultiparameterAssignmentErrors)
       end
 
       it "adds an error when Chronic returns nil" do
         invalid_comment_attributes = {'published_at(1i)' => "2009", 'published_at(2i)' => "12", 'published_at(3i)' => "90", 'published_at(4i)' => "12", 'published_at(5i)' => "34"}
-        @comment.update_attributes(invalid_comment_attributes)
+        @comment.update(invalid_comment_attributes)
         @comment.errors[:published_at].should == ['is not a real date']
       end
     end
