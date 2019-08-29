@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new("1.2.0") then
-      s.add_development_dependency("activerecord", ["~> 6.0.0.rc1"])
+      s.add_development_dependency("activerecord", ["~> 6.0"])
       s.add_development_dependency("bundler", ["~> 1.0"])
       s.add_dependency("chronic")
       s.add_development_dependency("database_cleaner")
