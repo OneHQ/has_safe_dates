@@ -61,7 +61,7 @@ module HasSafeDates
         callstack.each do |name, values_with_empty_parameters|
           if ActiveRecord::Base.has_safe_fields_config[self.class.base_class][:fields].include?(name)
             date = values_with_empty_parameters.values_at(1, 2, 3).join("-")
-            time = values_with_empty_parameters.values_at(4, 5).join(":")
+            time = values_with_empty_parameters.values_at(4, 5).compact.join(":")
             datetime_string = "#{date}#{time.blank? ? "" : " #{time}"}"
 
             # Convert multiparameter parts into a Date string, e.g. "2011-4-23",
