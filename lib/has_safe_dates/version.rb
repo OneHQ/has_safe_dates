@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 module HasSafeDates
-  VERSION = "2.0.3"
+  VERSION = "5.0.0-beta.1"
 end
