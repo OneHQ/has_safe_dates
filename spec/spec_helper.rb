@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+require "logger"
 require "active_support"
 require "active_record"
 require "database_cleaner"
@@ -5,32 +8,25 @@ require "yaml"
 
 ENV["debug"] = "test" unless ENV["debug"]
 
-# Establish DB Connection
-config = YAML::load(IO.read(File.join(File.dirname(__FILE__), "db", "database.yml")))
-ActiveRecord::Base.configurations = {"test" => config[ENV["DB"] || "sqlite3"]}
-ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations["test"])
+config_path = File.join(__dir__, "db", "database.yml")
+config = YAML.load_file(config_path)
 
-# Load Test Schema into the Database
-load(File.dirname(__FILE__) + "/db/schema.rb")
+db_key = ENV["DB"] || "sqlite3"
+db_config = config.fetch(db_key)
 
-# Load in our code
-$LOAD_PATH.unshift "#{File.dirname(__FILE__)}/../lib"
+ActiveRecord::Base.establish_connection(db_config)
 
+load File.join(__dir__, "db", "schema.rb")
+
+$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 require "has_safe_dates"
 
 RSpec.configure do |config|
-
   config.before(:suite) do
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.clean_with(:truncation)
   end
 
-  config.before(:each) do
-    DatabaseCleaner.start
-  end
-
-  config.after(:each) do
-    DatabaseCleaner.clean
-  end
-
+  config.before(:each) { DatabaseCleaner.start }
+  config.after(:each)  { DatabaseCleaner.clean }
 end
