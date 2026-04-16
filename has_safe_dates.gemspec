@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.email                 = "kylejginavan@gmail.com"
   s.required_ruby_version = ">= 3.4"
 
-  s.extra_rdoc_files      = ["MIT-LICENSE.txt", "README.md"]
+  s.extra_rdoc_files      = %w[MIT-LICENSE.txt README.md]
   s.files                 = `git ls-files`.split("\n")
   s.homepage              = "http://github.com/kylejginavan/has_safe_dates"
   s.require_paths         = ["lib"]
