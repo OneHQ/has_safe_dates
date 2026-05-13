@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.date                  = "2012-02-24"
   s.description           = "Uses Chronic to parse incoming dates and does not raise errors on invalid multi parameter settings"
   s.email                 = "kylejginavan@gmail.com"
-  s.required_ruby_version = ">= 3.4"
+  s.required_ruby_version = ">= 3.0.0", "< 4.0.0"
 
   s.extra_rdoc_files      = %w[MIT-LICENSE.txt README.md]
   s.files                 = `git ls-files`.split("\n")
