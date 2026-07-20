@@ -7,33 +7,32 @@ metadata:
 spec:
   serviceAccountName: build-bot
   params:
-  - name: ci-image-name
-    value: onehq.azurecr.io/{{ .Values.gem }}-ci
-  - name: gem-name
-    value: "{{ .Values.gem }}"
-  - name: publish
-    value: '{{ .Values.publish }}'
-  - name: git-url
-    value: "https://{{ .Values.git.provider }}/{{ .Values.git.organization }}/{{ .Values.git.repository }}.git"
-  - name: git-sha
-    value: "{{ .Values.git.sha }}"
-  - name: git-ref
-    value: "{{ required "Required .Values.git.ref" .Values.git.ref }}"
-  - name: rubyVersion
-    value: "{{ .Values.rubyVersion }}"
-
+    - name: ci-image-name
+      value: onehq.azurecr.io/{{ .Values.gem }}-ci
+    - name: gem-name
+      value: "{{ .Values.gem }}"
+    - name: publish
+      value: '{{ .Values.publish }}'
+    - name: git-url
+      value: "https://{{ .Values.git.provider }}/{{ .Values.git.organization }}/{{ .Values.git.repository }}.git"
+    - name: git-sha
+      value: "{{ .Values.git.sha }}"
+    - name: git-ref
+      value: "{{ required "Required .Values.git.ref" .Values.git.ref }}"
+    - name: rubyVersion
+      value: "{{ .Values.rubyVersion }}"
 
   pipelineRef:
     name: gem-delivery-has-reports
   timeout: 1h30m0s
   podTemplate:
     volumes:
-    - name: oidc-token
-      projected:
-        sources:
-          - serviceAccountToken:
-              path: oidc-token
-              expirationSeconds: 1800
+      - name: oidc-token
+        projected:
+          sources:
+            - serviceAccountToken:
+                path: oidc-token
+                expirationSeconds: 1800
 
   workspaces:
     - name: git-source
@@ -45,4 +44,3 @@ spec:
           resources:
             requests:
               storage: 1Gi
-              

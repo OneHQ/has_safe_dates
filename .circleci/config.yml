@@ -25,8 +25,8 @@ jobs:
 
       - restore_cache:
           keys:
-          - has_safe_dates-dependencies-v1-{{ checksum "has_safe_dates.gemspec" }}
-          - has_safe_dates-dependencies-v1-
+            - has_safe_dates-dependencies-v1-{{ checksum "has_safe_dates.gemspec" }}
+            - has_safe_dates-dependencies-v1-
 
       - run:
           name: Install dependencies
@@ -65,8 +65,8 @@ jobs:
 
       - restore_cache:
           keys:
-          - has_safe_dates-dependencies-v1-{{ checksum "has_safe_dates.gemspec" }}
-          - has_safe_dates-dependencies-v1-
+            - has_safe_dates-dependencies-v1-{{ checksum "has_safe_dates.gemspec" }}
+            - has_safe_dates-dependencies-v1-
 
       - run:
           name: Install dependencies
