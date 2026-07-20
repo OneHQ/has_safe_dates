@@ -9,6 +9,7 @@ gem "byebug"
 gem "logger"
 gem "mutex_m"
 gem "ostruct"
+gem "psych"
 gem "sqlite3",                      "~> 1.4"
 
 gemspec
