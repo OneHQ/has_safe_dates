@@ -72,11 +72,11 @@ module HasSafeDates
           end
         end
       else
-        super(callstack)  # has_safe_dates is not enabled for the current field, so invoke the super method
+        super(callstack) # has_safe_dates is not enabled for the current field, so invoke the super method
       end
     end
   end
 end
 
-::ActiveRecord::Base.send :include, ::HasSafeDates::CoreExt
-::ActiveRecord::Base.send :prepend, ::HasSafeDates::DateTimeExt
+::ActiveRecord::Base.include ::HasSafeDates::CoreExt
+::ActiveRecord::Base.prepend ::HasSafeDates::DateTimeExt

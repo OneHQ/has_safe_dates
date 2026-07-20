@@ -40,29 +40,29 @@ Do the following to publish and push a new gem:
 
 1) Make sure the local working copy is clean with no pending commits:
 
-    $ git status
-    # On branch master
-    nothing to commit (working directory clean)
+   $ git status
+   # On branch master
+   nothing to commit (working directory clean)
 
 2) Edit the version number and increment per SEMVER versioning:
 
-    $ vi lib/has_safe_dates/version.rb
+   $ vi lib/has_safe_dates/version.rb
 
 3) Run gem build to create the gem:
 
-    $ gem build has_safe_dates.gemspec
+   $ gem build has_safe_dates.gemspec
 
 4) Test install the gem locally:
 
-    $ gem install has_safe_dates-0.0.1.gem
+   $ gem install has_safe_dates-0.0.1.gem
 
 5) Commit any changes and tag the commit at the current version:
 
-    $ git commit lib/has_safe_dates/version.rb -m "Releasing v0.0.1"
-    $ git tag v0.0.1
-    $ git push
+   $ git commit lib/has_safe_dates/version.rb -m "Releasing v0.0.1"
+   $ git tag v0.0.1
+   $ git push
 
 6) Push the gem to rubygems:
 
-    $ gem push has_safe_dates-0.0.1.gem
+   $ gem push has_safe_dates-0.0.1.gem
 
