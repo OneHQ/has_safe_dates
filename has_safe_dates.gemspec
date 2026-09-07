@@ -24,6 +24,10 @@ Gem::Specification.new do |s|
   s.summary               = "Chronic based date setting for ActiveRecord models"
   s.licenses              = ["HQ"]
 
+  # ActiveSupport 8.0 passes quirks_mode, which JSON 3 rejects.
+
+  s.add_dependency "json", "< 3"
+
   s.add_dependency "chronic",                                    "~> 0.10"
 
   s.add_development_dependency "activerecord",                   "~> 8.0.0"
