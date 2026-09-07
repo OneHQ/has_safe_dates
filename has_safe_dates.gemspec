@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "chronic",                                    "~> 0.10"
 
-  s.add_development_dependency "activerecord",                   "~> 7.2"
+  s.add_development_dependency "activerecord",                   "~> 8.0.0"
   s.add_development_dependency "database_cleaner",               "~> 2.1"
   s.add_development_dependency "rdoc",                           "~> 7.0"
   s.add_development_dependency "rspec",                          "~> 3.13"
