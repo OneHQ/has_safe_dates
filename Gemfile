@@ -10,6 +10,6 @@ gem "logger"
 gem "mutex_m"
 gem "ostruct"
 gem "pkg-config"
-gem "sqlite3",                      "~> 1.4"
+gem "sqlite3",                      "~> 2.1"
 
 gemspec
